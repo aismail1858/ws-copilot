@@ -1,0 +1,1 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\AhmedAbdelhamidIsmai\\Downloads\\agentic-workflow-for-coding\\backend']

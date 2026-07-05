@@ -1,0 +1,74 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ws-copilot-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ws-copilot-backend:1.0.0
+    container_name: ws-copilot-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://ws-copilot-redis:6379/0
+    command: uvicorn src.server:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+
+  worker:
+    image: ws-copilot-backend:1.0.0
+    container_name: ws-copilot-worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://ws-copilot-redis:6379/0
+    command: >
+      celery -A src.services.celery:celery_app worker
+      --loglevel=info
+      --pool=threads
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+
+  mcp:
+    image: ws-copilot-backend:1.0.0
+    container_name: ws-copilot-mcp
+    env_file:
+      - .env
+    ports:
+      - "8100:8100"
+    command: python -m src.mcp --transport http
+    restart: unless-stopped
+    networks:
+      - default
+
+networks:
+  default:
+    name: ws-copilot-network
+
+volumes:
+  redis_data:

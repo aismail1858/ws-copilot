@@ -1,0 +1,3 @@
+/**
+ * Chat components entry point.
+ */

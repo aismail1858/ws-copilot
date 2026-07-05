@@ -1,0 +1,63 @@
+%% role-permission-data-model.mmd
+%% ER-Diagramm zum Rollen- & Berechtigungsmodell fuer Quellen
+%% Bezug: docs/architecture/role-permission-concept.md, ADR-001 (docs/decisions.md)
+%% Neue/Geaenderte Tabellen sind mit (NEU) / (GEAENDERT) markiert.
+
+erDiagram
+    users ||--o{ roles : "role_key (NEU FK)"
+    users ||--o{ teams : "lead_id"
+    users ||--o{ team_members : "user_id"
+    users ||--o{ source_members : "user_id"
+    users ||--o{ project_documents : "owner_id (NEU)"
+    teams ||--o{ team_members : "team_id"
+    teams ||--o{ project_documents : "team_id (NEU, nullable)"
+    project_documents ||--o{ source_members : "document_id"
+    project_documents ||--o{ document_chunks : "document_id"
+
+    roles {
+        text key PK "(NEU) admin/team_lead/member/geschaeftsfuehrer..."
+        text label "(NEU) Anzeigename"
+        text tier "(NEU) admin|team_lead|member"
+        bool is_system "(NEU)"
+    }
+
+    users {
+        uuid id PK
+        text email
+        text role "FK->roles.key (GEAENDERT, war user|admin)"
+        text tier "abgeleitet aus role (NEU, optional)"
+    }
+
+    teams {
+        uuid id PK "(NEU)"
+        text name "(NEU)"
+        text slug "(NEU)"
+        uuid lead_id FK "(NEU) -> users.id"
+    }
+
+    team_members {
+        uuid team_id PK_FK "(NEU) -> teams.id"
+        uuid user_id PK_FK "(NEU) -> users.id"
+        uuid added_by FK "(NEU) admin|team_lead"
+    }
+
+    source_members {
+        uuid document_id PK_FK "(NEU) -> project_documents.id"
+        uuid user_id PK_FK "(NEU) -> users.id"
+        uuid granted_by FK "(NEU)"
+    }
+
+    project_documents {
+        uuid id PK
+        uuid project_id FK
+        uuid user_id FK "Kompatibilitaet ( bleibt )"
+        uuid owner_id FK "(NEU) Besitzer"
+        text visibility "(NEU) global|team|members|private"
+        uuid team_id FK "(NEU) nullable, wenn visibility=team"
+    }
+
+    document_chunks {
+        uuid id PK
+        uuid document_id FK
+        vector embedding
+    }

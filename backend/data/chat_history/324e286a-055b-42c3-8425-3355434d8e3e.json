@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "threads": [
+    {
+      "id": "e7adbb16-f506-469e-83e1-27221b9e0f2e",
+      "title": "Neuer Chat",
+      "pinned": false,
+      "folderId": "default",
+      "createdAt": "2026-07-05T16:43:00.246Z",
+      "updatedAt": "2026-07-05T16:43:00.246Z",
+      "messages": []
+    }
+  ],
+  "folders": [
+    {
+      "id": "default",
+      "name": "Allgemein",
+      "promptRules": "",
+      "createdAt": "2026-07-05T16:43:00.246Z",
+      "updatedAt": "2026-07-05T16:43:00.246Z",
+      "isDefault": true
+    }
+  ],
+  "activeThreadId": "e7adbb16-f506-469e-83e1-27221b9e0f2e",
+  "deletedThreadIds": [],
+  "updatedAt": "2026-07-05T21:02:27.153Z"
+}
